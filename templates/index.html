@@ -1,37 +1,54 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Создание трейда</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Создание трейда</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Создать трейд</h1>
-    <form action="/submit" method="post">
-        <label for="telegram_id">Telegram ID:</label>
-        <input type="text" id="telegram_id" name="telegram_id" required><br><br>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-6 text-center">Создать трейд</h1>
+    <form action="/submit" method="post" class="space-y-4">
+      <div>
+        <label for="telegram_id" class="block text-sm font-medium mb-1">Telegram ID</label>
+        <input type="text" id="telegram_id" name="telegram_id" required class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
 
-        <label for="give">Что отдаёшь:</label>
-        <input type="text" id="give" name="give" required><br><br>
+      <div>
+        <label for="give" class="block text-sm font-medium mb-1">Что отдаёшь</label>
+        <input type="text" id="give" name="give" required class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
 
-        <label for="receive">Что хочешь получить:</label>
-        <input type="text" id="receive" name="receive" required><br><br>
+      <div>
+        <label for="receive" class="block text-sm font-medium mb-1">Что хочешь получить</label>
+        <input type="text" id="receive" name="receive" required class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
 
-        <label for="comment">Комментарий:</label>
-        <textarea id="comment" name="comment"></textarea><br><br>
+      <div>
+        <label for="comment" class="block text-sm font-medium mb-1">Комментарий</label>
+        <textarea id="comment" name="comment" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
 
-        <button type="submit">Создать</button>
+      <div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition">
+          🚀 Создать трейд
+        </button>
+      </div>
     </form>
+  </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-      const tg = window.Telegram.WebApp;
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram.WebApp;
 
-      window.onload = () => {
-        const telegramId = tg.initDataUnsafe?.user?.id;
-        if (telegramId) {
-          document.getElementById("telegram_id").value = telegramId;
-        }
-      };
-    </script>
+    window.onload = () => {
+      const telegramId = tg.initDataUnsafe?.user?.id;
+      if (telegramId) {
+        document.getElementById("telegram_id").value = telegramId;
+      }
+    };
+  </script>
 </body>
 </html>
