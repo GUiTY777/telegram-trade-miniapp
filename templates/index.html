@@ -39,11 +39,9 @@
     </form>
   </div>
 
-  <!-- Подключение TonConnect UI -->
-  <script type="module">
-    import { TonConnectUI } from "https://unpkg.com/@tonconnect/ui@latest";
-
-    const tonConnectUI = new TonConnectUI({
+  <!-- Подключение TonConnect UI без модулей -->
+  <script>
+    const tonConnectUI = new window.TonConnectUI.TonConnectUI({
       manifestUrl: "https://web-production-9370b.up.railway.app/static/tonconnect-manifest.json",
       buttonRootId: "ton-connect-button"
     });
