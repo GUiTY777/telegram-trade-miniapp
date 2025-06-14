@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TON трейд</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="/static/tonconnect-ui.local.js"></script>
+  <!-- Настоящий TonConnect UI SDK -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
   <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md text-center">
@@ -18,36 +19,49 @@
       <p><strong>TON-адрес:</strong> <span id="wallet-address"></span></p>
     </div>
 
-    <form action="/submit" method="post" class="space-y-4 mt-6 hidden" id="trade-form">
-      <input type="hidden" id="wallet" name="wallet" />
-      <div>
-        <label for="give" class="block text-sm font-medium mb-1">Что отдаёшь</label>
-        <input type="text" id="give" name="give" required class="w-full border border-gray-300 rounded-xl px-4 py-2" />
-      </div>
-      <div>
-        <label for="receive" class="block text-sm font-medium mb-1">Что хочешь получить</label>
-        <input type="text" id="receive" name="receive" required class="w-full border border-gray-300 rounded-xl px-4 py-2" />
-      </div>
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-xl hover:bg-blue-700">
-        Отправить трейд
-      </button>
-    </form>
+    <div id="tokens-list" class="hidden text-left text-sm mt-4">
+      <p class="font-semibold mb-2">Ваши токены:</p>
+      <ul id="token-items" class="space-y-1 text-sm text-gray-700"></ul>
+    </div>
   </div>
 
   <script>
-    window.addEventListener("load", () => {
-      const tonConnectUI = new window.TonConnectUI.TonConnectUI({
+    window.addEventListener("load", async () => {
+      const tonConnectUI = new TonConnectUI.TonConnectUI({
         manifestUrl: "https://web-production-9370b.up.railway.app/static/tonconnect-manifest.json",
         buttonRootId: "ton-connect-button"
       });
 
-      tonConnectUI.onStatusChange(wallet => {
+      tonConnectUI.onStatusChange(async wallet => {
         if (wallet) {
           const address = wallet.account.address;
           document.getElementById("wallet-info").classList.remove("hidden");
           document.getElementById("wallet-address").innerText = address;
-          document.getElementById("wallet").value = address;
-          document.getElementById("trade-form").classList.remove("hidden");
+
+          // Загружаем токены через TonAPI
+          try {
+            const res = await fetch(`https://tonapi.io/v2/accounts/${address}/jettons`, {
+              headers: {
+                "Accept": "application/json"
+              }
+            });
+            const data = await res.json();
+            const tokens = data.balances || [];
+
+            const list = document.getElementById("token-items");
+            list.innerHTML = "";
+            tokens.forEach(t => {
+              const li = document.createElement("li");
+              li.innerHTML = `<strong>${t.jetton.name}</strong>: ${parseFloat(t.balance) / 10**t.jetton.decimals}`;
+              list.appendChild(li);
+            });
+
+            if (tokens.length > 0) {
+              document.getElementById("tokens-list").classList.remove("hidden");
+            }
+          } catch (err) {
+            console.error("Ошибка при загрузке токенов:", err);
+          }
         }
       });
     });
