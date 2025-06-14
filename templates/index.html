@@ -12,12 +12,15 @@
   <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md text-center">
     <h1 class="text-2xl font-bold mb-4">TON трейд</h1>
 
+    <!-- Кнопка подключения TonConnect -->
     <div id="ton-connect-button" class="mb-4"></div>
 
+    <!-- Информация о кошельке -->
     <div id="wallet-info" class="hidden text-left text-sm bg-gray-50 p-4 rounded-xl">
       <p><strong>TON-адрес:</strong> <span id="wallet-address"></span></p>
     </div>
 
+    <!-- Форма трейда -->
     <form action="/submit" method="post" class="space-y-4 mt-6 hidden" id="trade-form">
       <input type="hidden" id="telegram_id" name="telegram_id">
       <input type="hidden" id="wallet" name="wallet">
@@ -32,40 +35,25 @@
         <input type="text" id="receive" name="receive" required class="w-full border border-gray-300 rounded-xl px-4 py-2"/>
       </div>
 
-      <div>
-        <label for="comment" class="block text-sm font-medium mb-1">Комментарий</label>
-        <textarea id="comment" name="comment" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2"></textarea>
-      </div>
-
-      <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-xl">
-        🚀 Отправить трейд
-      </button>
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-xl hover:bg-blue-700">Отправить трейд</button>
     </form>
   </div>
 
-  <script>
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+  <!-- Подключение TonConnect UI -->
+  <script type="module">
+    import { TonConnectUI } from "https://unpkg.com/@tonconnect/ui@latest";
 
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: "https://web-production-9370b.up.railway.app/tonconnect-manifest.json",
+    const tonConnectUI = new TonConnectUI({
+      manifestUrl: "https://web-production-9370b.up.railway.app/static/tonconnect-manifest.json",
       buttonRootId: "ton-connect-button"
     });
 
     tonConnectUI.onStatusChange(wallet => {
       if (wallet) {
-        document.getElementById("wallet").value = wallet.account.address;
-        document.getElementById("wallet-address").textContent = wallet.account.address;
         document.getElementById("wallet-info").classList.remove("hidden");
+        document.getElementById("wallet-address").innerText = wallet.account.address;
+        document.getElementById("wallet").value = wallet.account.address;
         document.getElementById("trade-form").classList.remove("hidden");
-      }
-    });
-
-    window.addEventListener("DOMContentLoaded", () => {
-      const tg = window.Telegram.WebApp;
-      const telegramId = tg.initDataUnsafe?.user?.id;
-      if (telegramId) {
-        document.getElementById("telegram_id").value = telegramId;
       }
     });
   </script>
