@@ -1,19 +1,10 @@
-from flask import Flask, render_template, request
-import sqlite3
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+import json
+import os
 
 app = Flask(__name__)
 
-def init_db():
-    conn = sqlite3.connect('db.sqlite3')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS trades (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    owner_id TEXT,
-                    offer TEXT,
-                    want TEXT
-                )''')
-    conn.commit()
-    conn.close()
+TRADES_FILE = "trades.json"
 
 @app.route("/")
 def index():
@@ -21,25 +12,36 @@ def index():
 
 @app.route("/create_trade", methods=["POST"])
 def create_trade():
-    owner_id = request.form.get("owner_id")
-    offer = request.form.get("offer")
-    want = request.form.get("want")
-    conn = sqlite3.connect('db.sqlite3')
-    c = conn.cursor()
-    c.execute("INSERT INTO trades (owner_id, offer, want) VALUES (?, ?, ?)", (owner_id, offer, want))
-    conn.commit()
-    conn.close()
-    return "Trade created!"
+    wallet = request.form["wallet"]
+    nft_name = request.form["nft_name"]
+    token = request.form["token"]
+
+    trade = {"wallet": wallet, "nft_name": nft_name, "token": token}
+
+    trades = []
+    if os.path.exists(TRADES_FILE):
+        with open(TRADES_FILE, "r") as f:
+            trades = json.load(f)
+
+    trades.append(trade)
+
+    with open(TRADES_FILE, "w") as f:
+        json.dump(trades, f)
+
+    return redirect(url_for("index"))
 
 @app.route("/trades")
-def trades():
-    conn = sqlite3.connect('db.sqlite3')
-    c = conn.cursor()
-    c.execute("SELECT * FROM trades")
-    all_trades = c.fetchall()
-    conn.close()
-    return {"trades": all_trades}
+def list_trades():
+    trades = []
+    if os.path.exists(TRADES_FILE):
+        with open(TRADES_FILE, "r") as f:
+            trades = json.load(f)
+    return render_template("trades.html", trades=trades)
+
+# ✅ Новый маршрут для манифеста
+@app.route("/tonconnect-manifest.json")
+def tonconnect_manifest():
+    return send_from_directory("static", "tonconnect-manifest.json")
 
 if __name__ == "__main__":
-    init_db()
-    app.run()
+    app.run(debug=True)
