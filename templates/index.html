@@ -1,69 +1,43 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TON трейд</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Настоящий TonConnect UI SDK -->
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <!-- Подключаем официальный iframe SDK от TonConnect -->
+  <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
   <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md text-center">
     <h1 class="text-2xl font-bold mb-4">TON трейд</h1>
 
-    <div id="ton-connect-button" class="mb-4"></div>
+    <button id="connect-button" class="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700">
+      🔗 Подключить кошелёк
+    </button>
 
-    <div id="wallet-info" class="hidden text-left text-sm bg-gray-50 p-4 rounded-xl">
+    <div id="wallet-info" class="hidden mt-4 text-left text-sm bg-gray-50 p-4 rounded-xl">
       <p><strong>TON-адрес:</strong> <span id="wallet-address"></span></p>
-    </div>
-
-    <div id="tokens-list" class="hidden text-left text-sm mt-4">
-      <p class="font-semibold mb-2">Ваши токены:</p>
-      <ul id="token-items" class="space-y-1 text-sm text-gray-700"></ul>
     </div>
   </div>
 
   <script>
-    window.addEventListener("load", async () => {
-      const tonConnectUI = new TonConnectUI.TonConnectUI({
-        manifestUrl: "https://web-production-9370b.up.railway.app/static/tonconnect-manifest.json",
-        buttonRootId: "ton-connect-button"
-      });
+    const tonConnect = new window.TonConnect({
+      manifestUrl: "https://web-production-9370b.up.railway.app/static/tonconnect-manifest.json"
+    });
 
-      tonConnectUI.onStatusChange(async wallet => {
-        if (wallet) {
-          const address = wallet.account.address;
+    document.getElementById("connect-button").addEventListener("click", async () => {
+      try {
+        await tonConnect.connectWallet();
+        const wallet = tonConnect.wallet;
+        if (wallet?.account?.address) {
           document.getElementById("wallet-info").classList.remove("hidden");
-          document.getElementById("wallet-address").innerText = address;
-
-          // Загружаем токены через TonAPI
-          try {
-            const res = await fetch(`https://tonapi.io/v2/accounts/${address}/jettons`, {
-              headers: {
-                "Accept": "application/json"
-              }
-            });
-            const data = await res.json();
-            const tokens = data.balances || [];
-
-            const list = document.getElementById("token-items");
-            list.innerHTML = "";
-            tokens.forEach(t => {
-              const li = document.createElement("li");
-              li.innerHTML = `<strong>${t.jetton.name}</strong>: ${parseFloat(t.balance) / 10**t.jetton.decimals}`;
-              list.appendChild(li);
-            });
-
-            if (tokens.length > 0) {
-              document.getElementById("tokens-list").classList.remove("hidden");
-            }
-          } catch (err) {
-            console.error("Ошибка при загрузке токенов:", err);
-          }
+          document.getElementById("wallet-address").innerText = wallet.account.address;
         }
-      });
+      } catch (err) {
+        console.error("Ошибка подключения:", err);
+      }
     });
   </script>
 </body>
