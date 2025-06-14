@@ -3,50 +3,78 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Создание трейда</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Трейд через TON</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex items-center justify-center px-4">
-  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
-    <h1 class="text-2xl font-bold mb-6 text-center">Создать трейд</h1>
-    <form action="/submit" method="post" class="space-y-4">
-      <div>
-        <label for="telegram_id" class="block text-sm font-medium mb-1">Telegram ID</label>
-        <input type="text" id="telegram_id" name="telegram_id" required class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      </div>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md text-center">
+    <h1 class="text-2xl font-bold mb-4">TON трейд</h1>
+
+    <button id="connect-wallet" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-xl w-full mb-4">
+      🔐 Подключить TON-кошелёк
+    </button>
+
+    <div id="wallet-info" class="hidden text-left text-sm bg-gray-50 p-4 rounded-xl">
+      <p><strong>TON-адрес:</strong> <span id="wallet-address"></span></p>
+      <p><strong>Баланс:</strong> <span id="wallet-balance"></span> TON</p>
+    </div>
+
+    <form action="/submit" method="post" class="space-y-4 mt-6 hidden" id="trade-form">
+      <input type="hidden" id="telegram_id" name="telegram_id">
+      <input type="hidden" id="wallet" name="wallet">
 
       <div>
         <label for="give" class="block text-sm font-medium mb-1">Что отдаёшь</label>
-        <input type="text" id="give" name="give" required class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="text" id="give" name="give" required class="w-full border border-gray-300 rounded-xl px-4 py-2"/>
       </div>
 
       <div>
         <label for="receive" class="block text-sm font-medium mb-1">Что хочешь получить</label>
-        <input type="text" id="receive" name="receive" required class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="text" id="receive" name="receive" required class="w-full border border-gray-300 rounded-xl px-4 py-2"/>
       </div>
 
       <div>
         <label for="comment" class="block text-sm font-medium mb-1">Комментарий</label>
-        <textarea id="comment" name="comment" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        <textarea id="comment" name="comment" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-2"></textarea>
       </div>
 
-      <div>
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition">
-          🚀 Создать трейд
-        </button>
-      </div>
+      <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-xl">
+        🚀 Отправить трейд
+      </button>
     </form>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
+  <script type="module">
+    import { TonConnect } from "https://unpkg.com/@tonconnect/sdk@latest";
+
     const tg = window.Telegram.WebApp;
+    const tonConnect = new TonConnect();
+    const connectBtn = document.getElementById("connect-wallet");
+    const walletInfo = document.getElementById("wallet-info");
+    const walletAddress = document.getElementById("wallet-address");
+    const walletBalance = document.getElementById("wallet-balance");
+    const tradeForm = document.getElementById("trade-form");
+
+    tg.ready();
 
     window.onload = () => {
       const telegramId = tg.initDataUnsafe?.user?.id;
       if (telegramId) {
         document.getElementById("telegram_id").value = telegramId;
+      }
+    };
+
+    connectBtn.onclick = async () => {
+      await tonConnect.connectWallet();
+
+      const account = tonConnect.account;
+      if (account) {
+        document.getElementById("wallet").value = account.address;
+        walletAddress.textContent = account.address;
+        walletInfo.classList.remove("hidden");
+        tradeForm.classList.remove("hidden");
       }
     };
   </script>
