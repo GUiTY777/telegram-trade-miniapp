@@ -5,6 +5,6 @@
   "iconUrl": "https://web-production-9370b.up.railway.app/static/icon.png",
   "termsOfUseUrl": "https://t.me/NorTrade_bot",
   "privacyPolicyUrl": "https://t.me/NorTrade_bot",
-  "network": "testnet",
+  "network": "mainnet",
   "bridgeUrl": "https://bridge.tonapi.io/bridge"
 }
