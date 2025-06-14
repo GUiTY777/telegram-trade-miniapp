@@ -1,18 +1,37 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Создать трейд</title>
+    <title>Создание трейда</title>
 </head>
 <body>
-    <h2>Создать трейд</h2>
-    <form method="POST" action="/create_trade">
-        <label>Ваш Telegram ID:</label><br>
-        <input type="text" name="owner_id" /><br><br>
-        <label>Что вы предлагаете:</label><br>
-        <input type="text" name="offer" /><br><br>
-        <label>Что вы хотите взамен:</label><br>
-        <input type="text" name="want" /><br><br>
-        <input type="submit" value="Создать" />
+    <h1>Создать трейд</h1>
+    <form action="/submit" method="post">
+        <label for="telegram_id">Telegram ID:</label>
+        <input type="text" id="telegram_id" name="telegram_id" required><br><br>
+
+        <label for="give">Что отдаёшь:</label>
+        <input type="text" id="give" name="give" required><br><br>
+
+        <label for="receive">Что хочешь получить:</label>
+        <input type="text" id="receive" name="receive" required><br><br>
+
+        <label for="comment">Комментарий:</label>
+        <textarea id="comment" name="comment"></textarea><br><br>
+
+        <button type="submit">Создать</button>
     </form>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      const tg = window.Telegram.WebApp;
+
+      window.onload = () => {
+        const telegramId = tg.initDataUnsafe?.user?.id;
+        if (telegramId) {
+          document.getElementById("telegram_id").value = telegramId;
+        }
+      };
+    </script>
 </body>
 </html>
