@@ -1,7 +1,10 @@
 {
-  "url": "https://web-production-9370b.up.railway.app",
+  "manifest_version": "1",
   "name": "TON Trade Bot",
+  "url": "https://web-production-9370b.up.railway.app",
   "iconUrl": "https://web-production-9370b.up.railway.app/static/icon.png",
   "termsOfUseUrl": "https://t.me/NorTrade_bot",
-  "privacyPolicyUrl": "https://t.me/NorTrade_bot"
+  "privacyPolicyUrl": "https://t.me/NorTrade_bot",
+  "network": "testnet",
+  "bridgeUrl": "https://bridge.tonapi.io/bridge"
 }
