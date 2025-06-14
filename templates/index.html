@@ -3,56 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Трейд через TON</title>
+  <title>TON трейд</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Подключаем рабочую версию TonConnect UI -->
-  <script src="https://unpkg.com/@tonconnect/ui@0.0.1-beta.6/dist/tonconnect-ui.min.js"></script>
+  <!-- Рабочая библиотека TonConnect UI (iframe) -->
+  <script src="https://unpkg.com/@tonconnect/ui@0.0.6/dist/tonconnect-ui.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
   <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md text-center">
     <h1 class="text-2xl font-bold mb-4">TON трейд</h1>
 
-    <!-- Кнопка подключения TonConnect -->
+    <!-- Кнопка подключения -->
     <div id="ton-connect-button" class="mb-4"></div>
 
-    <!-- Информация о кошельке -->
+    <!-- Инфо о кошельке -->
     <div id="wallet-info" class="hidden text-left text-sm bg-gray-50 p-4 rounded-xl">
       <p><strong>TON-адрес:</strong> <span id="wallet-address"></span></p>
     </div>
 
     <!-- Форма трейда -->
     <form action="/submit" method="post" class="space-y-4 mt-6 hidden" id="trade-form">
-      <input type="hidden" id="telegram_id" name="telegram_id">
-      <input type="hidden" id="wallet" name="wallet">
+      <input type="hidden" id="wallet" name="wallet" />
 
       <div>
         <label for="give" class="block text-sm font-medium mb-1">Что отдаёшь</label>
-        <input type="text" id="give" name="give" required class="w-full border border-gray-300 rounded-xl px-4 py-2"/>
+        <input type="text" id="give" name="give" required class="w-full border border-gray-300 rounded-xl px-4 py-2" />
       </div>
 
       <div>
         <label for="receive" class="block text-sm font-medium mb-1">Что хочешь получить</label>
-        <input type="text" id="receive" name="receive" required class="w-full border border-gray-300 rounded-xl px-4 py-2"/>
+        <input type="text" id="receive" name="receive" required class="w-full border border-gray-300 rounded-xl px-4 py-2" />
       </div>
 
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-xl hover:bg-blue-700">Отправить трейд</button>
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-xl hover:bg-blue-700">
+        Отправить трейд
+      </button>
     </form>
   </div>
 
-  <!-- Инициализация с правильным путём доступа -->
+  <!-- Скрипт инициализации -->
   <script>
     window.addEventListener("load", () => {
-      const tonConnectUI = new window.TonConnectUiSdk.TonConnectUI({
+      const tonConnectUI = new TonConnectUI.TonConnectUI({
         manifestUrl: "https://web-production-9370b.up.railway.app/static/tonconnect-manifest.json",
         buttonRootId: "ton-connect-button"
       });
 
       tonConnectUI.onStatusChange(wallet => {
         if (wallet) {
+          const address = wallet.account.address;
           document.getElementById("wallet-info").classList.remove("hidden");
-          document.getElementById("wallet-address").innerText = wallet.account.address;
-          document.getElementById("wallet").value = wallet.account.address;
+          document.getElementById("wallet-address").innerText = address;
+          document.getElementById("wallet").value = address;
           document.getElementById("trade-form").classList.remove("hidden");
         }
       });
